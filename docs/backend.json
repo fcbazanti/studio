@@ -35,6 +35,14 @@
           "type": "string",
           "description": "Date and time the user registered.",
           "format": "date-time"
+        },
+        "bedtime": {
+          "type": "string",
+          "description": "User's typical bedtime in HH:mm format."
+        },
+        "wakeUpTime": {
+          "type": "string",
+          "description": "User's typical wake-up time in HH:mm format."
         }
       },
       "required": [

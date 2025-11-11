@@ -1,17 +1,107 @@
+'use client';
+
 import SleepForm from './sleep-form';
 import SleepChart from './sleep-chart';
+import { useDoc, useMemoFirebase, useUser } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { useFirebase } from '@/firebase';
+import { useActionState } from 'react';
+import { getSleepRecommendation } from './actions';
+import { Loader2 } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+
+type UserProfile = {
+  bedtime?: string;
+  wakeUpTime?: string;
+};
+
+const initialState = {
+  data: null,
+  error: null,
+};
 
 export default function SleepPage() {
+  const { firestore } = useFirebase();
+  const { user } = useUser();
+
+  const userProfileRef = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return doc(firestore, 'users', user.uid);
+  }, [firestore, user]);
+
+  const { data: userProfile, isLoading: isProfileLoading } =
+    useDoc<UserProfile>(userProfileRef);
+
+  const [formState, formAction, isPending] = useActionState(
+    getSleepRecommendation,
+    initialState
+  );
+
+  if (isProfileLoading) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <div className="p-4 space-y-4">
       <header>
-        <h2 className="text-2xl font-bold font-headline tracking-tight">Sleep Analysis</h2>
+        <h2 className="text-2xl font-bold font-headline tracking-tight">
+          Sleep Analysis
+        </h2>
         <p className="text-muted-foreground">
           Monitor your sleep and get weekly recommendations.
         </p>
       </header>
-      <SleepChart />
-      <SleepForm />
+      <SleepChart
+        bedtime={userProfile?.bedtime}
+        wakeUpTime={userProfile?.wakeUpTime}
+      />
+      <div className="space-y-4">
+        <form action={formAction}>
+          <input
+            type="hidden"
+            name="bedtime"
+            value={userProfile?.bedtime || ''}
+          />
+          <input
+            type="hidden"
+            name="wakeUpTime"
+            value={userProfile?.wakeUpTime || ''}
+          />
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isPending || !userProfile?.bedtime}
+          >
+            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Analyze My Sleep
+          </Button>
+        </form>
+
+        {formState.data && (
+          <Card className="bg-primary/10 border-primary">
+            <CardHeader>
+              <CardTitle>Your Weekly Recommendation</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-foreground">
+                {formState.data.weeklyRecommendation}
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {formState.error && (
+          <Card className="bg-destructive/10 border-destructive">
+            <CardHeader>
+              <CardTitle>An Error Occurred</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-destructive-foreground">{formState.error}</p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }
