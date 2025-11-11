@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { CalendarDays, Clock, ListTodo, Moon } from 'lucide-react';
+import { CalendarDays, ListTodo, Moon, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/dashboard/todos', label: 'To-Do', icon: ListTodo },
-  { href: '/dashboard/calendar', label: 'Calendar', icon: CalendarDays },
-  { href: '/dashboard/time', label: 'Time', icon: Clock },
+  { href: '/dashboard/calendar', label: 'Plan', icon: CalendarDays },
   { href: '/dashboard/sleep', label: 'Sleep', icon: Moon },
+  { href: '/dashboard/account', label: 'Account', icon: User },
 ];
 
 export function BottomNav() {
@@ -25,7 +25,7 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex flex-col items-center justify-center gap-1 text-muted-foreground transition-colors duration-200',
+                'flex flex-col items-center justify-center gap-1 text-muted-foreground transition-colors duration-200 w-16',
                 isActive && 'text-primary'
               )}
             >

@@ -1,4 +1,4 @@
-import { Leaf } from 'lucide-react';
+import { CheckSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type AppIconProps = {
@@ -6,5 +6,5 @@ type AppIconProps = {
 };
 
 export function AppIcon({ className }: AppIconProps) {
-  return <Leaf className={cn('text-primary', className)} />;
+  return <CheckSquare className={cn('text-primary', className)} />;
 }

@@ -1,4 +1,5 @@
 import SleepForm from './sleep-form';
+import SleepChart from './sleep-chart';
 
 export default function SleepPage() {
   return (
@@ -9,6 +10,7 @@ export default function SleepPage() {
           Monitor your sleep and get weekly recommendations.
         </p>
       </header>
+      <SleepChart />
       <SleepForm />
     </div>
   );

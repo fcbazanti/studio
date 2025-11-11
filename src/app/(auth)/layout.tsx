@@ -26,10 +26,10 @@ export default function AuthLayout({
       <div className="flex flex-col items-center gap-4 mb-8 text-center">
         <AppIcon className="w-16 h-16" />
         <h1 className="text-4xl font-bold text-foreground font-headline">
-          Verdant Day
+          My Day
         </h1>
         <p className="text-lg text-muted-foreground">
-          Plan your day, inspired by nature.
+          Plan your day, your way.
         </p>
       </div>
 

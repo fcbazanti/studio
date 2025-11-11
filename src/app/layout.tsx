@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'Verdant Day',
-  description: 'Plan your day with nature as your guide.',
+  title: 'My Day',
+  description: 'Plan your day, your way.',
 };
 
 export default function RootLayout({
