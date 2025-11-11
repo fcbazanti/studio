@@ -20,10 +20,10 @@ const SleepRecommendationOutputSchema = z.object({
   weeklyRecommendation: z
     .string()
     .describe(
-      'A recommendation on whether the user needs to sleep more or less, based on their sleep data.
+      `A recommendation on whether the user needs to sleep more or less, based on their sleep data.
        If the user should maintain their current sleep schedule, the recommendation should be positive and encouraging.
        The recommendation should be no more than two sentences long.
-      '
+      `
     ),
 });
 export type SleepRecommendationOutput = z.infer<typeof SleepRecommendationOutputSchema>;
