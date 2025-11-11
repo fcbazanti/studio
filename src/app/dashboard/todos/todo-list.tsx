@@ -24,46 +24,65 @@ import {
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { format, isToday, isPast } from 'date-fns';
-
-const initialTodos: Todo[] = [];
+import { useCollection, useFirebase, useUser, useMemoFirebase } from '@/firebase';
+import { addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { collection, doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 
 export default function TodoList() {
-  const [todos, setTodos] = useState<Todo[]>(initialTodos);
+  const { firestore } = useFirebase();
+  const { user } = useUser();
+
+  const todosQuery = useMemoFirebase(() => {
+    if (!firestore || !user) return null;
+    return collection(firestore, 'users', user.uid, 'todos');
+  }, [firestore, user]);
+
+  const { data: todos, isLoading } = useCollection<Todo>(todosQuery);
+  
   const [newTodoText, setNewTodoText] = useState('');
   const [newTodoDueDate, setNewTodoDueDate] = useState<Date | undefined>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleAddTodo = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newTodoText.trim()) {
-      const newTodo: Todo = {
-        id: Date.now().toString(),
+    if (newTodoText.trim() && user) {
+      const newTodo = {
         text: newTodoText.trim(),
         completed: false,
         dueDate: newTodoDueDate,
+        createdAt: serverTimestamp(),
+        userId: user.uid,
       };
-      setTodos([...todos, newTodo]);
+      addDocumentNonBlocking(collection(firestore, 'users', user.uid, 'todos'), newTodo);
       setNewTodoText('');
       setNewTodoDueDate(undefined);
       setIsDialogOpen(false);
     }
   };
 
-  const toggleTodo = (id: string) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
+  const toggleTodo = (id: string, completed: boolean) => {
+    if (user) {
+      const todoRef = doc(firestore, 'users', user.uid, 'todos', id);
+      updateDocumentNonBlocking(todoRef, { completed: !completed });
+    }
   };
 
   const clearCompleted = () => {
-    setTodos(todos.filter((todo) => !todo.completed));
+    if (user && todos) {
+      const batch = writeBatch(firestore);
+      todos.filter(todo => todo.completed).forEach(todo => {
+        const todoRef = doc(firestore, 'users', user.uid, 'todos', todo.id);
+        batch.delete(todoRef);
+      });
+      batch.commit().catch(error => {
+        console.error("Error clearing completed todos: ", error);
+      });
+    }
   };
   
   const getDueDateClass = (dueDate: Date) => {
     if (isToday(dueDate)) return "text-accent-foreground bg-accent";
-    if (isPast(dueDate)) return "text-destructive-foreground bg-destructive/80";
+    if (isPast(dueDate) && !isToday(dueDate)) return "text-destructive-foreground bg-destructive/80";
     return "text-muted-foreground bg-muted";
   }
 
@@ -71,8 +90,9 @@ export default function TodoList() {
     <div className="space-y-4">
       <Card>
         <CardContent className="p-4 space-y-3">
-          {todos.length > 0 ? (
-            todos.map((todo) => (
+          {isLoading && <p className="text-muted-foreground text-center p-4">Loading tasks...</p>}
+          {!isLoading && todos && todos.length > 0 ? (
+            todos.sort((a,b) => (a.dueDate as any) - (b.dueDate as any)).map((todo) => (
               <div
                 key={todo.id}
                 className="flex items-center gap-3 p-2 rounded-md transition-colors hover:bg-muted/50"
@@ -80,7 +100,7 @@ export default function TodoList() {
                 <Checkbox
                   id={`todo-${todo.id}`}
                   checked={todo.completed}
-                  onCheckedChange={() => toggleTodo(todo.id)}
+                  onCheckedChange={() => toggleTodo(todo.id, todo.completed)}
                   className="w-5 h-5"
                 />
                 <label
@@ -93,14 +113,14 @@ export default function TodoList() {
                   {todo.text}
                 </label>
                 {todo.dueDate && (
-                  <div className={cn("text-xs px-2 py-0.5 rounded-full whitespace-nowrap", getDueDateClass(todo.dueDate))}>
-                    {format(todo.dueDate, 'MMM d')}
+                  <div className={cn("text-xs px-2 py-0.5 rounded-full whitespace-nowrap", getDueDateClass(new Date((todo.dueDate as any).seconds * 1000)))}>
+                    {format(new Date((todo.dueDate as any).seconds * 1000), 'MMM d')}
                   </div>
                 )}
               </div>
             ))
           ) : (
-            <p className="text-muted-foreground text-center p-4">
+            !isLoading && <p className="text-muted-foreground text-center p-4">
               Your list is clear. Add a task to get started!
             </p>
           )}
@@ -109,7 +129,7 @@ export default function TodoList() {
       <div className="flex gap-2">
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="flex-1" variant="default">
+            <Button className="flex-1" variant="default" disabled={!user}>
               <Plus className="mr-2 h-4 w-4" />
               Add Task
             </Button>
@@ -156,7 +176,7 @@ export default function TodoList() {
             </form>
           </DialogContent>
         </Dialog>
-        <Button variant="destructive" size="icon" onClick={clearCompleted} disabled={!todos.some(t => t.completed)}>
+        <Button variant="destructive" size="icon" onClick={clearCompleted} disabled={!todos || !todos.some(t => t.completed)}>
           <Trash className="h-4 w-4" />
           <span className="sr-only">Clear Completed</span>
         </Button>

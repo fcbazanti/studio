@@ -1,13 +1,34 @@
+'use client';
 import { TopNav } from '@/components/top-nav';
 import { AppIcon } from '@/components/app-icon';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
+import { useUser } from '@/firebase';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.replace('/login');
+    }
+  }, [user, isUserLoading, router]);
+
+  if (isUserLoading || !user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex justify-center w-full min-h-full bg-muted/40">
       <div className="flex flex-col w-full max-w-md bg-background shadow-lg">
@@ -18,8 +39,8 @@ export default function DashboardLayout({
             </div>
             <Link href="/dashboard/account">
               <Avatar>
-                <AvatarImage src="https://picsum.photos/seed/user/40/40" alt="User" data-ai-hint="person face" />
-                <AvatarFallback>U</AvatarFallback>
+                <AvatarImage src={user.photoURL ?? "https://picsum.photos/seed/user/40/40"} alt={user.displayName ?? "User"} data-ai-hint="person face" />
+                <AvatarFallback>{user.email?.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
             </Link>
         </header>
