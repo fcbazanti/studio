@@ -34,9 +34,9 @@ service cloud.firestore {
 
       allow get: if isOwner(userId);
       allow list: if false; // Listing all users is not permitted.
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isOwner(userId) && resource.data.id == userId;
-      allow delete: if isOwner(userId) && resource.data.id == userId;
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
     }
 
     /**
@@ -55,8 +55,8 @@ service cloud.firestore {
       allow get: if isOwner(userProfileId);
       allow list: if isOwner(userProfileId);
       allow create: if isOwner(userProfileId);
-      allow update: if isOwner(userProfileId) && resource.data.userId == userProfileId;
-      allow delete: if isOwner(userProfileId) && resource.data.userId == userProfileId;
+      allow update: if isOwner(userProfileId);
+      allow delete: if isOwner(userProfileId);
     }
 
     /**
@@ -75,8 +75,8 @@ service cloud.firestore {
       allow get: if isOwner(userProfileId);
       allow list: if isOwner(userProfileId);
       allow create: if isOwner(userProfileId);
-      allow update: if isOwner(userProfileId) && resource.data.userId == userProfileId;
-      allow delete: if isOwner(userProfileId) && resource.data.userId == userProfileId;
+      allow update: if isOwner(userProfileId);
+      allow delete: if isOwner(userProfileId);
     }
 
     /**

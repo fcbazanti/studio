@@ -15,9 +15,21 @@
           "description": "User's email address.",
           "format": "email"
         },
-        "username": {
+        "firstName": {
           "type": "string",
-          "description": "The user's chosen username."
+          "description": "The user's first name."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The user's last name."
+        },
+        "age": {
+          "type": "number",
+          "description": "The user's age."
+        },
+        "address": {
+          "type": "string",
+          "description": "The user's address."
         },
         "registrationDate": {
           "type": "string",
@@ -28,7 +40,6 @@
       "required": [
         "id",
         "email",
-        "username",
         "registrationDate"
       ]
     },
@@ -42,7 +53,7 @@
           "type": "string",
           "description": "Unique identifier for the to-do item."
         },
-        "userProfileId": {
+        "userId": {
           "type": "string",
           "description": "Reference to UserProfile. (Relationship: UserProfile 1:N TodoItem)"
         },
@@ -62,9 +73,8 @@
       },
       "required": [
         "id",
-        "userProfileId",
+        "userId",
         "text",
-        "dueDate",
         "completed"
       ]
     },
@@ -78,7 +88,7 @@
           "type": "string",
           "description": "Unique identifier for the calendar event."
         },
-        "userProfileId": {
+        "userId": {
           "type": "string",
           "description": "Reference to UserProfile. (Relationship: UserProfile 1:N CalendarEvent)"
         },
@@ -107,7 +117,7 @@
       },
       "required": [
         "id",
-        "userProfileId",
+        "userId",
         "title",
         "description",
         "startTime",
