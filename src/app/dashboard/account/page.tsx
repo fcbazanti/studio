@@ -10,15 +10,17 @@ import { doc } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
 import { Camera, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { useToast } from '@/hooks/use-toast';
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 type UserProfile = {
   firstName?: string;
   lastName?: string;
   age?: number;
   address?: string;
+  photoURL?: string;
 };
 
 export default function AccountPage() {
@@ -26,6 +28,7 @@ export default function AccountPage() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const userProfileRef = useMemoFirebase(() => {
     if (!firestore || !user) return null;
@@ -35,6 +38,7 @@ export default function AccountPage() {
   const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserProfile>(userProfileRef);
 
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [age, setAge] = useState('');
@@ -96,6 +100,41 @@ export default function AccountPage() {
     }
   };
 
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user || !auth.currentUser || !userProfileRef) return;
+
+    setIsUploading(true);
+    try {
+      const storage = getStorage();
+      const storageRef = ref(storage, `profile-pictures/${user.uid}`);
+      
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      await updateProfile(auth.currentUser, { photoURL: downloadURL });
+      setDocumentNonBlocking(userProfileRef, { photoURL: downloadURL }, { merge: true });
+
+      toast({
+        title: 'Úspěch!',
+        description: 'Váš profilový obrázek byl změněn.',
+      });
+    } catch (error) {
+      console.error("Chyba při nahrávání obrázku: ", error);
+      toast({
+        variant: "destructive",
+        title: 'Jejda!',
+        description: 'Při nahrávání obrázku se vyskytla chyba.',
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  }
+
 
   if (isUserLoading || isProfileLoading) {
     return <p>Načítání...</p>;
@@ -128,10 +167,19 @@ export default function AccountPage() {
                 variant="outline"
                 size="icon"
                 className="absolute bottom-0 right-0 rounded-full bg-background"
+                onClick={handleAvatarClick}
+                disabled={isUploading}
               >
-                <Camera className="w-5 h-5" />
+                {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
                 <span className="sr-only">Změnit profilový obrázek</span>
               </Button>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileChange}
+                className="hidden" 
+                accept="image/png, image/jpeg, image/gif"
+              />
             </div>
             <div className='text-center'>
                 <h3 className="text-2xl font-bold">{user.displayName || 'Uživatel'}</h3>

@@ -31,6 +31,10 @@
           "type": "string",
           "description": "The user's address."
         },
+        "photoURL": {
+          "type": "string",
+          "description": "URL of the user's profile picture."
+        },
         "registrationDate": {
           "type": "string",
           "description": "Date and time the user registered.",
