@@ -19,8 +19,6 @@ type UserProfile = {
   lastName?: string;
   age?: number;
   address?: string;
-  bedtime?: string;
-  wakeUpTime?: string;
 };
 
 export default function AccountPage() {
@@ -41,8 +39,6 @@ export default function AccountPage() {
   const [lastName, setLastName] = useState('');
   const [age, setAge] = useState('');
   const [address, setAddress] = useState('');
-  const [bedtime, setBedtime] = useState('');
-  const [wakeUpTime, setWakeUpTime] = useState('');
 
 
   useEffect(() => {
@@ -51,13 +47,9 @@ export default function AccountPage() {
       setLastName(userProfile.lastName || user?.displayName?.split(' ')[1] || '');
       setAge(userProfile.age?.toString() || '');
       setAddress(userProfile.address || '');
-      setBedtime(userProfile.bedtime || '22:30');
-      setWakeUpTime(userProfile.wakeUpTime || '06:30');
     } else if (user) {
         setFirstName(user.displayName?.split(' ')[0] || '');
         setLastName(user.displayName?.split(' ')[1] || '');
-        setBedtime('22:30');
-        setWakeUpTime('06:30');
     }
   }, [userProfile, user]);
 
@@ -78,8 +70,6 @@ export default function AccountPage() {
         lastName,
         age: age ? parseInt(age, 10) : undefined,
         address,
-        bedtime,
-        wakeUpTime,
     };
 
     try {
@@ -172,17 +162,6 @@ export default function AccountPage() {
               <Label htmlFor="address">Address</Label>
               <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} />
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                  <Label htmlFor="bedtime">Default Bedtime</Label>
-                  <Input id="bedtime" type="time" value={bedtime} onChange={(e) => setBedtime(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                  <Label htmlFor="wakeUpTime">Default Wake-up Time</Label>
-                  <Input id="wakeUpTime" type="time" value={wakeUpTime} onChange={(e) => setWakeUpTime(e.target.value)} />
-              </div>
-            </div>
             
             <Button type="submit" className="w-full" disabled={isSaving}>
                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -195,3 +174,5 @@ export default function AccountPage() {
     </div>
   );
 }
+
+    

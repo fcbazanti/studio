@@ -3,10 +3,32 @@
 import { analyzeSleepAndRecommend, type SleepAnalysisInput } from '@/ai/flows/sleep-analysis-and-recommendations';
 import { z } from 'zod';
 
-const SleepSchema = z.object({
+const DayScheduleSchema = z.object({
   bedtime: z.string(),
   wakeUpTime: z.string(),
 });
+
+const SleepScheduleSchema = z.object({
+  monday: DayScheduleSchema.optional(),
+  tuesday: DayScheduleSchema.optional(),
+  wednesday: DayScheduleSchema.optional(),
+  thursday: DayScheduleSchema.optional(),
+  friday: DayScheduleSchema.optional(),
+  saturday: DayScheduleSchema.optional(),
+  sunday: DayScheduleSchema.optional(),
+});
+
+const FormSchema = z.object({
+  sleepSchedule: z.string().transform((str, ctx) => {
+    try {
+      return SleepScheduleSchema.parse(JSON.parse(str));
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Invalid JSON for sleep schedule' });
+      return z.NEVER;
+    }
+  }),
+});
+
 
 type FormState = {
   data: { weeklyRecommendation: string } | null;
@@ -18,19 +40,20 @@ export async function getSleepRecommendation(
   formData: FormData
 ): Promise<FormState> {
   try {
-    const validatedFields = SleepSchema.safeParse({
-      bedtime: formData.get('bedtime'),
-      wakeUpTime: formData.get('wakeUpTime'),
+    const validatedFields = FormSchema.safeParse({
+      sleepSchedule: formData.get('sleepSchedule'),
     });
 
     if (!validatedFields.success) {
       return {
         data: null,
-        error: 'Invalid data provided. Please check your times.',
+        error: 'Invalid data provided. Please check your schedule.',
       };
     }
 
-    const input: SleepAnalysisInput = validatedFields.data;
+    const input: SleepAnalysisInput = {
+      sleepSchedule: validatedFields.data.sleepSchedule,
+    };
     const result = await analyzeSleepAndRecommend(input);
     return { data: result, error: null };
   } catch (error) {
@@ -41,3 +64,5 @@ export async function getSleepRecommendation(
     };
   }
 }
+
+    

@@ -36,13 +36,60 @@
           "description": "Date and time the user registered.",
           "format": "date-time"
         },
-        "bedtime": {
-          "type": "string",
-          "description": "User's typical bedtime in HH:mm format."
-        },
-        "wakeUpTime": {
-          "type": "string",
-          "description": "User's typical wake-up time in HH:mm format."
+        "sleepSchedule": {
+          "type": "object",
+          "description": "User's weekly sleep schedule.",
+          "properties": {
+            "monday": {
+              "type": "object",
+              "properties": {
+                "bedtime": { "type": "string", "format": "time" },
+                "wakeUpTime": { "type": "string", "format": "time" }
+              }
+            },
+            "tuesday": {
+              "type": "object",
+              "properties": {
+                "bedtime": { "type": "string", "format": "time" },
+                "wakeUpTime": { "type": "string", "format": "time" }
+              }
+            },
+            "wednesday": {
+              "type": "object",
+              "properties": {
+                "bedtime": { "type": "string", "format": "time" },
+                "wakeUpTime": { "type": "string", "format": "time" }
+              }
+            },
+            "thursday": {
+              "type": "object",
+              "properties": {
+                "bedtime": { "type": "string", "format": "time" },
+                "wakeUpTime": { "type": "string", "format": "time" }
+              }
+            },
+            "friday": {
+              "type": "object",
+              "properties": {
+                "bedtime": { "type": "string", "format": "time" },
+                "wakeUpTime": { "type": "string", "format": "time" }
+              }
+            },
+            "saturday": {
+              "type": "object",
+              "properties": {
+                "bedtime": { "type": "string", "format": "time" },
+                "wakeUpTime": { "type": "string", "format": "time" }
+              }
+            },
+            "sunday": {
+              "type": "object",
+              "properties": {
+                "bedtime": { "type": "string", "format": "time" },
+                "wakeUpTime": { "type": "string", "format": "time" }
+              }
+            }
+          }
         }
       },
       "required": [
@@ -263,3 +310,4 @@
     "reasoning": "The Firestore data structure is designed to provide a secure, scalable, and maintainable backend for the Verdant Day application, focusing on user-specific data and collaborative features. The primary goal is to ensure authorization independence, eliminating the need for `get()` calls in security rules by denormalizing authorization-related data. This structure also supports secure `list` operations by segregating data based on ownership and access control.\n\n**Data Segregation and Ownership:**\n\n*   User profiles are stored under `/users/{userId}`, ensuring that only the authenticated user can access their profile data. This path-based ownership simplifies security rules.\n*   Todo items, calendar events, and sleep data are stored as subcollections under each user's profile (`/users/{userId}/todos/{todoId}`, `/users/{userId}/calendarEvents/{calendarEventId}`, and `/users/{userId}/sleepData/{sleepDataId}`). This establishes a clear 1:N relationship, providing straightforward ownership and simplifying security rules.\n\n**Authorization Independence:**\n\n*   Since all data is private and user-owned, no denormalization is needed.\n\n**QAPs (Rules Are Not Filters):**\n\n*   The structure enables secure `list` operations because data is segregated by user ID. Security rules can efficiently check `request.auth.uid == userId` to authorize listing operations within a user's collection.\n\n**Scalability and Maintainability:**\n\n*   The design promotes scalability by avoiding complex queries and nested `get()` calls. Security rules are simple and efficient, leading to better performance.\n*   The clear structure and naming conventions enhance maintainability, making it easier to understand and modify the security rules and data model.\n\n**Addressing Specific Requirements:**\n\n*   **User Account Persistence**: User profiles are stored to persist user data across sessions.\n*   **History Tracking**: Storing tasks and events allows for history tracking within the user's data.\n*   **Recurring Events**: The inclusion of `recurringRule` field in the calendar schema addresses the need for recurring events."
   }
 }
+    

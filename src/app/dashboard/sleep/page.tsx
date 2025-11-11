@@ -10,10 +10,14 @@ import { getSleepRecommendation } from './actions';
 import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useMemo } from 'react';
+
+type SleepSchedule = {
+  [key: string]: { bedtime: string; wakeUpTime: string };
+};
 
 type UserProfile = {
-  bedtime?: string;
-  wakeUpTime?: string;
+  sleepSchedule?: SleepSchedule;
 };
 
 const initialState = {
@@ -38,6 +42,16 @@ export default function SleepPage() {
     initialState
   );
 
+  const sleepScheduleString = useMemo(() => {
+    if (!userProfile?.sleepSchedule) return '';
+    try {
+      return JSON.stringify(userProfile.sleepSchedule);
+    } catch (e) {
+      return '';
+    }
+  }, [userProfile?.sleepSchedule]);
+
+
   if (isProfileLoading) {
     return <p>Loading...</p>;
   }
@@ -52,26 +66,21 @@ export default function SleepPage() {
           Monitor your sleep and get weekly recommendations.
         </p>
       </header>
-      <SleepChart
-        bedtime={userProfile?.bedtime}
-        wakeUpTime={userProfile?.wakeUpTime}
-      />
+      <SleepChart sleepSchedule={userProfile?.sleepSchedule} />
+      
+      <SleepForm userProfile={userProfile} />
+
       <div className="space-y-4">
         <form action={formAction}>
           <input
             type="hidden"
-            name="bedtime"
-            value={userProfile?.bedtime || ''}
-          />
-          <input
-            type="hidden"
-            name="wakeUpTime"
-            value={userProfile?.wakeUpTime || ''}
+            name="sleepSchedule"
+            value={sleepScheduleString}
           />
           <Button
             type="submit"
             className="w-full"
-            disabled={isPending || !userProfile?.bedtime}
+            disabled={isPending || !userProfile?.sleepSchedule}
           >
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Analyze My Sleep
@@ -105,3 +114,5 @@ export default function SleepPage() {
     </div>
   );
 }
+
+    
