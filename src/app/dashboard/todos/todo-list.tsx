@@ -46,13 +46,15 @@ export default function TodoList() {
   const handleAddTodo = (e: React.FormEvent) => {
     e.preventDefault();
     if (newTodoText.trim() && user) {
-      const newTodo = {
+      const newTodo: any = {
         text: newTodoText.trim(),
         completed: false,
-        dueDate: newTodoDueDate,
         createdAt: serverTimestamp(),
         userId: user.uid,
       };
+      if (newTodoDueDate) {
+        newTodo.dueDate = newTodoDueDate;
+      }
       addDocumentNonBlocking(collection(firestore, 'users', user.uid, 'todos'), newTodo);
       setNewTodoText('');
       setNewTodoDueDate(undefined);
