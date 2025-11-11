@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { AppIcon } from '@/components/app-icon';
@@ -29,7 +31,7 @@ export default function AuthLayout({
           My Day
         </h1>
         <p className="text-lg text-muted-foreground">
-          Plan your day, your way.
+          Naplánujte si svůj den po svém.
         </p>
       </div>
 

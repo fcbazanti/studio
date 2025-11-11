@@ -77,7 +77,7 @@ export default function TodoList() {
         batch.delete(todoRef);
       });
       batch.commit().catch(error => {
-        console.error("Error clearing completed todos: ", error);
+        console.error("Chyba při mazání dokončených úkolů: ", error);
       });
     }
   };
@@ -92,7 +92,7 @@ export default function TodoList() {
     <div className="space-y-4">
       <Card>
         <CardContent className="p-4 space-y-3">
-          {isLoading && <p className="text-muted-foreground text-center p-4">Loading tasks...</p>}
+          {isLoading && <p className="text-muted-foreground text-center p-4">Načítání úkolů...</p>}
           {!isLoading && todos && todos.length > 0 ? (
             todos.sort((a,b) => (a.dueDate as any) - (b.dueDate as any)).map((todo) => (
               <div
@@ -116,14 +116,14 @@ export default function TodoList() {
                 </label>
                 {todo.dueDate && (
                   <div className={cn("text-xs px-2 py-0.5 rounded-full whitespace-nowrap", getDueDateClass(new Date((todo.dueDate as any).seconds * 1000)))}>
-                    {format(new Date((todo.dueDate as any).seconds * 1000), 'MMM d')}
+                    {format(new Date((todo.dueDate as any).seconds * 1000), 'd. MMM')}
                   </div>
                 )}
               </div>
             ))
           ) : (
             !isLoading && <p className="text-muted-foreground text-center p-4">
-              Your list is clear. Add a task to get started!
+              Váš seznam je prázdný. Přidejte úkol a začněte!
             </p>
           )}
         </CardContent>
@@ -133,16 +133,16 @@ export default function TodoList() {
           <DialogTrigger asChild>
             <Button className="flex-1" variant="default" disabled={!user}>
               <Plus className="mr-2 h-4 w-4" />
-              Add Task
+              Přidat úkol
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Add a new task</DialogTitle>
+              <DialogTitle>Přidat nový úkol</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleAddTodo} className="grid gap-4 py-4">
               <Input
-                placeholder="What do you need to do?"
+                placeholder="Co je potřeba udělat?"
                 value={newTodoText}
                 onChange={(e) => setNewTodoText(e.target.value)}
                 autoFocus
@@ -157,7 +157,7 @@ export default function TodoList() {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {newTodoDueDate ? format(newTodoDueDate, 'PPP') : <span>Pick a date</span>}
+                    {newTodoDueDate ? format(newTodoDueDate, 'PPP') : <span>Vyberte datum</span>}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -171,16 +171,16 @@ export default function TodoList() {
               </Popover>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button type="button" variant="ghost">Cancel</Button>
+                  <Button type="button" variant="ghost">Zrušit</Button>
                 </DialogClose>
-                <Button type="submit">Add Task</Button>
+                <Button type="submit">Přidat úkol</Button>
               </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
         <Button variant="destructive" size="icon" onClick={clearCompleted} disabled={!todos || !todos.some(t => t.completed)}>
           <Trash className="h-4 w-4" />
-          <span className="sr-only">Clear Completed</span>
+          <span className="sr-only">Smazat dokončené</span>
         </Button>
       </div>
     </div>

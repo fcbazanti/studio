@@ -36,44 +36,44 @@ export default function LoginPage() {
   };
 
   if (isUserLoading || user) {
-    return <p>Loading...</p>;
+    return <p>Načítání...</p>;
   }
 
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Login</CardTitle>
+        <CardTitle className="text-2xl">Přihlášení</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account.
+          Zadejte svůj e-mail pro přihlášení k vašemu účtu.
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleLogin}>
         <CardContent className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">E-mail</Label>
             <Input id="email" type="email" placeholder="m@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Heslo</Label>
             <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button className="w-full" type="submit">
-            Sign in
+            Přihlásit se
           </Button>
           <div className="relative w-full">
               <Separator className="absolute top-1/2 -translate-y-1/2"/>
-              <p className="text-xs uppercase text-muted-foreground bg-card px-2 relative w-fit mx-auto">Or continue with</p>
+              <p className="text-xs uppercase text-muted-foreground bg-card px-2 relative w-fit mx-auto">Nebo pokračujte s</p>
           </div>
           <div className="grid grid-cols-2 gap-2 w-full">
             <Button variant="outline" type="button">GitHub</Button>
             <Button variant="outline" type="button">Google</Button>
           </div>
           <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
+            Nemáte účet?{' '}
             <Link href="/signup" className="underline">
-              Sign up
+              Zaregistrujte se
             </Link>
           </div>
         </CardFooter>

@@ -14,9 +14,13 @@ import { useAuth, useUser } from '@/firebase';
 import { initiateEmailSignUp } from '@/firebase/non-blocking-login';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { doc } from 'firebase/firestore';
+import { useFirebase } from '@/firebase';
+import { updateProfile } from 'firebase/auth';
 
 export default function SignupPage() {
-  const auth = useAuth();
+  const { auth, firestore } = useFirebase();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
 
@@ -27,9 +31,22 @@ export default function SignupPage() {
 
   useEffect(() => {
     if (!isUserLoading && user) {
+      const userProfileRef = doc(firestore, 'users', user.uid);
+      const profileData = {
+        firstName,
+        lastName,
+        email: user.email,
+        registrationDate: new Date().toISOString(),
+      };
+      setDocumentNonBlocking(userProfileRef, profileData, { merge: true });
+
+      if (auth.currentUser) {
+        updateProfile(auth.currentUser, { displayName: `${firstName} ${lastName}`.trim() });
+      }
+
       router.replace('/dashboard');
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, router, firestore, auth, firstName, lastName]);
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,31 +54,31 @@ export default function SignupPage() {
   };
 
   if (isUserLoading || user) {
-    return <p>Loading...</p>;
+    return <p>Načítání...</p>;
   }
 
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Sign Up</CardTitle>
+        <CardTitle className="text-2xl">Zaregistrovat se</CardTitle>
         <CardDescription>
-          Enter your information to create an account
+          Zadejte své údaje pro vytvoření účtu
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSignup}>
         <CardContent className="grid gap-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="first-name">First name</Label>
+              <Label htmlFor="first-name">Křestní jméno</Label>
               <Input id="first-name" placeholder="Max" required value={firstName} onChange={(e) => setFirstName(e.target.value)} />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="last-name">Last name</Label>
+              <Label htmlFor="last-name">Příjmení</Label>
               <Input id="last-name" placeholder="Robinson" required value={lastName} onChange={(e) => setLastName(e.target.value)} />
             </div>
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">E-mail</Label>
             <Input
               id="email"
               type="email"
@@ -72,18 +89,18 @@ export default function SignupPage() {
             />
           </div>
           <div className="grid gap-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Heslo</Label>
             <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
           <Button type="submit" className="w-full mt-2">
-             Create an account
+             Vytvořit účet
           </Button>
         </CardContent>
       </form>
       <CardHeader className="pt-0 text-center text-sm">
-        Already have an account?{' '}
+        Už máte účet?{' '}
         <Link href="/login" className="underline">
-          Sign in
+          Přihlásit se
         </Link>
       </CardHeader>
     </Card>

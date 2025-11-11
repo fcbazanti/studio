@@ -5,7 +5,7 @@ import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
   title: 'My Day',
-  description: 'Plan your day, your way.',
+  description: 'Naplánujte si svůj den po svém.',
 };
 
 export default function RootLayout({

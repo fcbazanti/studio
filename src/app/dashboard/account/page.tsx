@@ -73,25 +73,23 @@ export default function AccountPage() {
     };
 
     try {
-      // Update Firestore document
       setDocumentNonBlocking(userProfileRef, profileData, { merge: true });
 
-      // Update auth profile
       if (auth.currentUser && auth.currentUser.displayName !== newDisplayName) {
         await updateProfile(auth.currentUser, { displayName: newDisplayName });
       }
       
       toast({
-        title: 'Success!',
-        description: 'Your profile has been updated.',
+        title: 'Úspěch!',
+        description: 'Váš profil byl aktualizován.',
       });
 
     } catch (error) {
-      console.error("Error updating profile: ", error);
+      console.error("Chyba při aktualizaci profilu: ", error);
        toast({
         variant: "destructive",
-        title: 'Uh oh!',
-        description: 'There was a problem saving your profile.',
+        title: 'Jejda!',
+        description: 'Při ukládání vašeho profilu se vyskytl problém.',
       });
     } finally {
       setIsSaving(false);
@@ -100,7 +98,7 @@ export default function AccountPage() {
 
 
   if (isUserLoading || isProfileLoading) {
-    return <p>Loading...</p>;
+    return <p>Načítání...</p>;
   }
 
   if (!user) {
@@ -112,10 +110,10 @@ export default function AccountPage() {
     <div className="p-4 space-y-4">
       <header>
         <h2 className="text-2xl font-bold font-headline tracking-tight">
-          My Account
+          Můj účet
         </h2>
         <p className="text-muted-foreground">
-          View and edit your profile information.
+          Zobrazte a upravte informace o svém profilu.
         </p>
       </header>
       <Card>
@@ -123,7 +121,7 @@ export default function AccountPage() {
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
               <Avatar className="w-32 h-32">
-                <AvatarImage src={user.photoURL || "https://picsum.photos/seed/user/128/128"} alt="User" data-ai-hint="person face" />
+                <AvatarImage src={user.photoURL || "https://picsum.photos/seed/user/128/128"} alt="Uživatel" data-ai-hint="person face" />
                 <AvatarFallback>{user.email?.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               <Button
@@ -132,11 +130,11 @@ export default function AccountPage() {
                 className="absolute bottom-0 right-0 rounded-full bg-background"
               >
                 <Camera className="w-5 h-5" />
-                <span className="sr-only">Change profile picture</span>
+                <span className="sr-only">Změnit profilový obrázek</span>
               </Button>
             </div>
             <div className='text-center'>
-                <h3 className="text-2xl font-bold">{user.displayName || 'User'}</h3>
+                <h3 className="text-2xl font-bold">{user.displayName || 'Uživatel'}</h3>
                 <p className="text-muted-foreground">{user.email}</p>
             </div>
           </div>
@@ -144,35 +142,33 @@ export default function AccountPage() {
           <form className="space-y-4" onSubmit={handleSave}>
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
+                    <Label htmlFor="firstName">Křestní jméno</Label>
                     <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
+                    <Label htmlFor="lastName">Příjmení</Label>
                     <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} />
                 </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="age">Age</Label>
+              <Label htmlFor="age">Věk</Label>
               <Input id="age" type="number" value={age} onChange={(e) => setAge(e.target.value)} />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
+              <Label htmlFor="address">Adresa</Label>
               <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} />
             </div>
             
             <Button type="submit" className="w-full" disabled={isSaving}>
                 {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save Changes
+                Uložit změny
             </Button>
-            <Button type="button" variant="outline" className="w-full" onClick={handleLogout}>Log Out</Button>
+            <Button type="button" variant="outline" className="w-full" onClick={handleLogout}>Odhlásit se</Button>
           </form>
         </CardContent>
       </Card>
     </div>
   );
 }
-
-    

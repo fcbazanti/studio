@@ -26,12 +26,10 @@ import { collection, doc, serverTimestamp } from 'firebase/firestore';
 const isEventOnDate = (event: CalendarEvent, date: Date): boolean => {
     const eventStartDate = new Date((event.startTime as any).seconds * 1000);
   
-    // If the selected date is before the event's start date, it can't occur.
     if (isBefore(date, eventStartDate) && !isSameDayFns(date, eventStartDate)) {
         return false;
     }
 
-    // Always show on the original start date
     if (isSameDayFns(date, eventStartDate)) {
         return true;
     }
@@ -42,10 +40,8 @@ const isEventOnDate = (event: CalendarEvent, date: Date): boolean => {
         case 'daily':
             return isAfter(date, eventStartDate) || isSameDayFns(date, eventStartDate);
         case 'weekly':
-            // Check if it's after the start date and on the same day of the week
             return (isAfter(date, eventStartDate) || isSameDayFns(date, eventStartDate)) && getDay(date) === getDay(eventStartDate);
         case 'monthly':
-            // Check if it's after the start date and on the same day of the month
             return (isAfter(date, eventStartDate) || isSameDayFns(date, eventStartDate)) && getDate(date) === getDate(eventStartDate);
         default:
             return isSameDayFns(date, eventStartDate);
@@ -116,52 +112,52 @@ export default function CalendarView() {
       
       <div className="flex justify-between items-center">
         <h3 className="font-semibold">
-          Events for {date ? format(date, 'MMMM d') : '...'}
+          Události pro {date ? format(date, 'd. MMMM') : '...'}
         </h3>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" disabled={!user}>
-              <Plus className="mr-2 h-4 w-4" /> Add Event
+              <Plus className="mr-2 h-4 w-4" /> Přidat událost
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Add Event for {date ? format(date, 'MMMM d') : ''}</DialogTitle>
+              <DialogTitle>Přidat událost pro {date ? format(date, 'd. MMMM') : ''}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleAddEvent} className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="title">Event Title</Label>
+                <Label htmlFor="title">Název události</Label>
                 <Input id="title" value={newEventTitle} onChange={(e) => setNewEventTitle(e.target.value)} required />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="start-time">Start Time</Label>
+                  <Label htmlFor="start-time">Čas začátku</Label>
                   <Input id="start-time" type="time" value={newEventStartTime} onChange={(e) => setNewEventStartTime(e.target.value)} required />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="end-time">End Time</Label>
+                  <Label htmlFor="end-time">Čas konce</Label>
                   <Input id="end-time" type="time" value={newEventEndTime} onChange={(e) => setNewEventEndTime(e.target.value)} required />
                 </div>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="repeat">Repeat</Label>
+                <Label htmlFor="repeat">Opakování</Label>
                 <Select value={newEventRepeat} onValueChange={setNewEventRepeat}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Does not repeat" />
+                    <SelectValue placeholder="Neopakuje se" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">Does not repeat</SelectItem>
-                    <SelectItem value="daily">Daily</SelectItem>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                    <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value="none">Neopakuje se</SelectItem>
+                    <SelectItem value="daily">Denně</SelectItem>
+                    <SelectItem value="weekly">Týdně</SelectItem>
+                    <SelectItem value="monthly">Měsíčně</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button type="button" variant="ghost">Cancel</Button>
+                  <Button type="button" variant="ghost">Zrušit</Button>
                 </DialogClose>
-                <Button type="submit">Save Event</Button>
+                <Button type="submit">Uložit událost</Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -169,7 +165,7 @@ export default function CalendarView() {
       </div>
 
       <div className="space-y-2">
-        {isLoading && <p className="text-muted-foreground text-center pt-4">Loading events...</p>}
+        {isLoading && <p className="text-muted-foreground text-center pt-4">Načítání událostí...</p>}
         {!isLoading && todaysEvents.length > 0 ? (
           todaysEvents.map((event) => (
             <Card key={event.id}>
@@ -187,13 +183,13 @@ export default function CalendarView() {
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => handleDeleteEvent(event.id)}>
                   <Trash className="w-4 h-4 text-destructive" />
-                  <span className="sr-only">Delete event</span>
+                  <span className="sr-only">Smazat událost</span>
                 </Button>
               </CardContent>
             </Card>
           ))
         ) : (
-          !isLoading && <p className="text-muted-foreground text-center pt-4">No events for this day.</p>
+          !isLoading && <p className="text-muted-foreground text-center pt-4">Žádné události pro tento den.</p>
         )}
       </div>
     </div>

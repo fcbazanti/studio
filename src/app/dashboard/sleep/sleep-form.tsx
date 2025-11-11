@@ -25,6 +25,15 @@ type UserProfile = {
 };
 
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+const DAY_NAMES_CZ: { [key: string]: string } = {
+  monday: 'Pondělí',
+  tuesday: 'Úterý',
+  wednesday: 'Středa',
+  thursday: 'Čtvrtek',
+  friday: 'Pátek',
+  saturday: 'Sobota',
+  sunday: 'Neděle'
+};
 
 const DEFAULT_SCHEDULE: SleepSchedule = DAYS.reduce((acc, day) => {
   acc[day] = { bedtime: '22:30', wakeUpTime: '06:30' };
@@ -46,7 +55,6 @@ export default function SleepForm({ userProfile }: { userProfile?: UserProfile }
 
   useEffect(() => {
     if (userProfile?.sleepSchedule) {
-      // Ensure all days are present, falling back to default if not.
       const completeSchedule = DAYS.reduce((acc, day) => {
         acc[day] = userProfile.sleepSchedule?.[day] || DEFAULT_SCHEDULE[day];
         return acc;
@@ -73,8 +81,8 @@ export default function SleepForm({ userProfile }: { userProfile?: UserProfile }
     setDocumentNonBlocking(userProfileRef, { sleepSchedule: schedule }, { merge: true });
 
     toast({
-      title: 'Schedule Saved!',
-      description: 'Your new sleep schedule has been saved.',
+      title: 'Plán uložen!',
+      description: 'Váš nový spánkový plán byl uložen.',
     });
     setIsSaving(false);
   };
@@ -82,9 +90,9 @@ export default function SleepForm({ userProfile }: { userProfile?: UserProfile }
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Weekly Sleep Schedule</CardTitle>
+        <CardTitle>Týdenní spánkový plán</CardTitle>
         <CardDescription>
-          Set your target bedtime and wake-up time for each day.
+          Nastavte si cílový čas spánku a vstávání pro každý den.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -92,10 +100,10 @@ export default function SleepForm({ userProfile }: { userProfile?: UserProfile }
           {DAYS.map(day => (
             <div key={day} className="grid grid-cols-3 items-center gap-4">
               <Label htmlFor={`${day}-bedtime`} className="capitalize text-right">
-                {day}
+                {DAY_NAMES_CZ[day]}
               </Label>
               <div className="space-y-1">
-                <Label htmlFor={`${day}-bedtime`} className="text-xs text-muted-foreground">Bedtime</Label>
+                <Label htmlFor={`${day}-bedtime`} className="text-xs text-muted-foreground">Spát</Label>
                 <Input
                   id={`${day}-bedtime`}
                   type="time"
@@ -104,7 +112,7 @@ export default function SleepForm({ userProfile }: { userProfile?: UserProfile }
                 />
               </div>
               <div className="space-y-1">
-                <Label htmlFor={`${day}-wake`} className="text-xs text-muted-foreground">Wake up</Label>
+                <Label htmlFor={`${day}-wake`} className="text-xs text-muted-foreground">Vstávat</Label>
                 <Input
                   id={`${day}-wake`}
                   type="time"
@@ -116,12 +124,10 @@ export default function SleepForm({ userProfile }: { userProfile?: UserProfile }
           ))}
           <Button type="submit" className="w-full" disabled={isSaving}>
             {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Save Schedule
+            Uložit plán
           </Button>
         </form>
       </CardContent>
     </Card>
   );
 }
-
-    

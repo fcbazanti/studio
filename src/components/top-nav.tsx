@@ -8,15 +8,13 @@ import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
 
 const navItems = [
   { href: '/dashboard/todos', label: 'To-Do', icon: ListTodo },
-  { href: '/dashboard/calendar', label: 'Calendar', icon: CalendarDays },
-  { href: '/dashboard/sleep', label: 'Sleep', icon: Moon },
+  { href: '/dashboard/calendar', label: 'Kalendář', icon: CalendarDays },
+  { href: '/dashboard/sleep', label: 'Spánek', icon: Moon },
 ];
 
 export function TopNav() {
   const pathname = usePathname();
 
-  // Find the current active tab. We check for the start of the href
-  // to correctly highlight parent routes (e.g. /dashboard/todos).
   const activeTab = navItems.find((item) => pathname.startsWith(item.href))?.href ?? pathname;
 
   return (

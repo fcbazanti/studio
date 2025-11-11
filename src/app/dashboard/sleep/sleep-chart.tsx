@@ -45,14 +45,14 @@ function calculateSleepDuration(bedtime?: string, wakeUpTime?: string) {
 }
 
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-const DAY_MAP = {
-    monday: 'Mon',
-    tuesday: 'Tue',
-    wednesday: 'Wed',
-    thursday: 'Thu',
-    friday: 'Fri',
-    saturday: 'Sat',
-    sunday: 'Sun'
+const DAY_MAP_CZ = {
+    monday: 'Po',
+    tuesday: 'Út',
+    wednesday: 'St',
+    thursday: 'Čt',
+    friday: 'Pá',
+    saturday: 'So',
+    sunday: 'Ne'
 }
 
 export default function SleepChart({
@@ -66,7 +66,7 @@ export default function SleepChart({
     return DAYS.map((day) => {
         const schedule = sleepSchedule[day];
         const sleepHours = calculateSleepDuration(schedule?.bedtime, schedule?.wakeUpTime);
-        return { day: DAY_MAP[day as keyof typeof DAY_MAP], hours: sleepHours };
+        return { day: DAY_MAP_CZ[day as keyof typeof DAY_MAP_CZ], hours: sleepHours };
     });
   }, [sleepSchedule]);
 
@@ -75,9 +75,9 @@ export default function SleepChart({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Weekly Sleep Duration</CardTitle>
+        <CardTitle>Týdenní délka spánku</CardTitle>
         <CardDescription>
-          Your estimated sleep hours based on your weekly schedule.
+          Vaše odhadované hodiny spánku na základě vašeho týdenního plánu.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -97,14 +97,14 @@ export default function SleepChart({
               <Bar
                 dataKey="hours"
                 fill="hsl(var(--primary))"
-                name="Hours Slept"
+                name="Prospané hodiny"
               />
             </BarChart>
           </ResponsiveContainer>
         ) : (
           <div className="text-center text-muted-foreground p-8">
             <p>
-              Please set your weekly sleep schedule below to see your sleep chart.
+              Nastavte si prosím svůj týdenní spánkový plán níže, abyste viděli svůj graf spánku.
             </p>
           </div>
         )}
@@ -112,5 +112,3 @@ export default function SleepChart({
     </Card>
   );
 }
-
-    

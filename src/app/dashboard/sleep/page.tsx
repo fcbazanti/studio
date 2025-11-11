@@ -53,17 +53,17 @@ export default function SleepPage() {
 
 
   if (isProfileLoading) {
-    return <p>Loading...</p>;
+    return <p>Načítání...</p>;
   }
 
   return (
     <div className="p-4 space-y-4">
       <header>
         <h2 className="text-2xl font-bold font-headline tracking-tight">
-          Sleep Analysis
+          Analýza spánku
         </h2>
         <p className="text-muted-foreground">
-          Monitor your sleep and get weekly recommendations.
+          Sledujte svůj spánek a získejte týdenní doporučení.
         </p>
       </header>
       <SleepChart sleepSchedule={userProfile?.sleepSchedule} />
@@ -83,14 +83,14 @@ export default function SleepPage() {
             disabled={isPending || !userProfile?.sleepSchedule}
           >
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Analyze My Sleep
+            Analyzovat můj spánek
           </Button>
         </form>
 
         {formState.data && (
           <Card className="bg-primary/10 border-primary">
             <CardHeader>
-              <CardTitle>Your Weekly Recommendation</CardTitle>
+              <CardTitle>Vaše týdenní doporučení</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-foreground">
@@ -103,7 +103,7 @@ export default function SleepPage() {
         {formState.error && (
           <Card className="bg-destructive/10 border-destructive">
             <CardHeader>
-              <CardTitle>An Error Occurred</CardTitle>
+              <CardTitle>Vyskytla se chyba</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-destructive-foreground">{formState.error}</p>
@@ -114,5 +114,3 @@ export default function SleepPage() {
     </div>
   );
 }
-
-    

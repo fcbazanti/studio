@@ -24,7 +24,7 @@ export default function DashboardLayout({
   if (isUserLoading || !user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p>Loading...</p>
+        <p>Načítání...</p>
       </div>
     );
   }

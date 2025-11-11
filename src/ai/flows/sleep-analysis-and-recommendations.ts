@@ -11,8 +11,8 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const DayScheduleSchema = z.object({
-  bedtime: z.string().describe("The user's bedtime for this day, in HH:mm format."),
-  wakeUpTime: z.string().describe("The user's wake-up time for this day, in HH:mm format."),
+  bedtime: z.string().describe("Čas, kdy uživatel chodí spát, ve formátu HH:mm."),
+  wakeUpTime: z.string().describe("Čas, kdy uživatel vstává, ve formátu HH:mm."),
 });
 
 const SleepAnalysisInputSchema = z.object({
@@ -24,7 +24,7 @@ const SleepAnalysisInputSchema = z.object({
     friday: DayScheduleSchema.optional(),
     saturday: DayScheduleSchema.optional(),
     sunday: DayScheduleSchema.optional(),
-  }).describe("The user's sleep schedule for the entire week."),
+  }).describe("Spánkový plán uživatele na celý týden."),
 });
 export type SleepAnalysisInput = z.infer<typeof SleepAnalysisInputSchema>;
 
@@ -32,11 +32,12 @@ const SleepRecommendationOutputSchema = z.object({
   weeklyRecommendation: z
     .string()
     .describe(
-      `A recommendation on the user's weekly sleep schedule. 
-       Analyze the consistency of bedtimes and wake-up times, and total sleep duration for each day.
-       Provide actionable advice to improve their sleep hygiene.
-       If the schedule is good, the recommendation should be positive and encouraging.
-       The recommendation should be a few sentences long.
+      `Doporučení ohledně týdenního spánkového plánu uživatele.
+       Analyzujte konzistenci časů spánku a vstávání a celkovou dobu spánku pro každý den.
+       Poskytněte konkrétní rady pro zlepšení spánkové hygieny.
+       Pokud je plán dobrý, doporučení by mělo být pozitivní a povzbuzující.
+       Doporučení by mělo být dlouhé několik vět.
+       Odpovězte v češtině.
       `
     ),
 });
@@ -52,21 +53,21 @@ const prompt = ai.definePrompt({
   name: 'sleepAnalysisPrompt',
   input: {schema: SleepAnalysisInputSchema},
   output: {schema: SleepRecommendationOutputSchema},
-  prompt: `You are a sleep analysis expert. Based on the user's weekly sleep schedule, provide a recommendation.
+  prompt: `Jste expert na analýzu spánku. Na základě týdenního spánkového plánu uživatele poskytněte doporučení. Odpovězte v češtině.
 
-   Analyze the consistency of their bedtimes, wake-up times, and total sleep duration for each day. Note any large variations, especially between weekdays and weekends.
+   Analyzujte konzistenci jejich časů spánku, časů vstávání a celkové doby spánku pro každý den. Všimněte si jakýchkoli velkých odchylek, zejména mezi všedními dny a víkendy.
    
-   Here is the user's schedule:
-   {{#if sleepSchedule.monday}}Monday: Bedtime: {{{sleepSchedule.monday.bedtime}}}, Wake-up: {{{sleepSchedule.monday.wakeUpTime}}}{{/if}}
-   {{#if sleepSchedule.tuesday}}Tuesday: Bedtime: {{{sleepSchedule.tuesday.bedtime}}}, Wake-up: {{{sleepSchedule.tuesday.wakeUpTime}}}{{/if}}
-   {{#if sleepSchedule.wednesday}}Wednesday: Bedtime: {{{sleepSchedule.wednesday.bedtime}}}, Wake-up: {{{sleepSchedule.wednesday.wakeUpTime}}}{{/if}}
-   {{#if sleepSchedule.thursday}}Thursday: Bedtime: {{{sleepSchedule.thursday.bedtime}}}, Wake-up: {{{sleepSchedule.thursday.wakeUpTime}}}{{/if}}
-   {{#if sleepSchedule.friday}}Friday: Bedtime: {{{sleepSchedule.friday.bedtime}}}, Wake-up: {{{sleepSchedule.friday.wakeUpTime}}}{{/if}}
-   {{#if sleepSchedule.saturday}}Saturday: Bedtime: {{{sleepSchedule.saturday.bedtime}}}, Wake-up: {{{sleepSchedule.saturday.wakeUpTime}}}{{/if}}
-   {{#if sleepSchedule.sunday}}Sunday: Bedtime: {{{sleepSchedule.sunday.bedtime}}}, Wake-up: {{{sleepSchedule.sunday.wakeUpTime}}}{{/if}}
+   Zde je plán uživatele:
+   {{#if sleepSchedule.monday}}Pondělí: Spánek: {{{sleepSchedule.monday.bedtime}}}, Vstávání: {{{sleepSchedule.monday.wakeUpTime}}}{{/if}}
+   {{#if sleepSchedule.tuesday}}Úterý: Spánek: {{{sleepSchedule.tuesday.bedtime}}}, Vstávání: {{{sleepSchedule.tuesday.wakeUpTime}}}{{/if}}
+   {{#if sleepSchedule.wednesday}}Středa: Spánek: {{{sleepSchedule.wednesday.bedtime}}}, Vstávání: {{{sleepSchedule.wednesday.wakeUpTime}}}{{/if}}
+   {{#if sleepSchedule.thursday}}Čtvrtek: Spánek: {{{sleepSchedule.thursday.bedtime}}}, Vstávání: {{{sleepSchedule.thursday.wakeUpTime}}}{{/if}}
+   {{#if sleepSchedule.friday}}Pátek: Spánek: {{{sleepSchedule.friday.bedtime}}}, Vstávání: {{{sleepSchedule.friday.wakeUpTime}}}{{/if}}
+   {{#if sleepSchedule.saturday}}Sobota: Spánek: {{{sleepSchedule.saturday.bedtime}}}, Vstávání: {{{sleepSchedule.saturday.wakeUpTime}}}{{/if}}
+   {{#if sleepSchedule.sunday}}Neděle: Spánek: {{{sleepSchedule.sunday.bedtime}}}, Vstávání: {{{sleepSchedule.sunday.wakeUpTime}}}{{/if}}
 
-   Provide actionable advice to improve their sleep hygiene. If the schedule is good and consistent, the recommendation should be positive and encouraging.
-   The recommendation should be a few sentences long.`,
+   Poskytněte konkrétní rady pro zlepšení jejich spánkové hygieny. Pokud je plán dobrý a konzistentní, doporučení by mělo být pozitivní a povzbuzující.
+   Doporučení by mělo být dlouhé několik vět. Odpovězte v češtině.`,
 });
 
 const analyzeSleepAndRecommendFlow = ai.defineFlow(
@@ -80,5 +81,3 @@ const analyzeSleepAndRecommendFlow = ai.defineFlow(
     return output!;
   }
 );
-
-    
