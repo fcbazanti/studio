@@ -1,3 +1,10 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "auth-background",
+      "description": "A beautiful, serene forest path with sunlight filtering through the trees.",
+      "imageUrl": "https://images.unsplash.com/photo-1495395226200-8fbf6b720b8c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Zm9yZXN0JTIwcGF0aHxlbnwwfHx8fDE3NjI4MTYyMjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "forest path"
+    }
+  ]
 }

@@ -1,0 +1,171 @@
+'use client';
+
+import { useState } from 'react';
+import type { Todo } from '@/lib/types';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Plus, Trash, Calendar as CalendarIcon } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
+import { format, isToday, isPast } from 'date-fns';
+
+const initialTodos: Todo[] = [
+  { id: '1', text: 'Morning meditation', completed: true, dueDate: new Date() },
+  { id: '2', text: 'Team stand-up meeting', completed: false, dueDate: new Date() },
+  { id: '3', text: 'Finish project proposal', completed: false, dueDate: new Date(new Date().setDate(new Date().getDate() + 1)) },
+  { id: '4', text: 'Go for a run', completed: false },
+];
+
+export default function TodoList() {
+  const [todos, setTodos] = useState<Todo[]>(initialTodos);
+  const [newTodoText, setNewTodoText] = useState('');
+  const [newTodoDueDate, setNewTodoDueDate] = useState<Date | undefined>();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleAddTodo = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newTodoText.trim()) {
+      const newTodo: Todo = {
+        id: Date.now().toString(),
+        text: newTodoText.trim(),
+        completed: false,
+        dueDate: newTodoDueDate,
+      };
+      setTodos([...todos, newTodo]);
+      setNewTodoText('');
+      setNewTodoDueDate(undefined);
+      setIsDialogOpen(false);
+    }
+  };
+
+  const toggleTodo = (id: string) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
+    );
+  };
+
+  const clearCompleted = () => {
+    setTodos(todos.filter((todo) => !todo.completed));
+  };
+  
+  const getDueDateClass = (dueDate: Date) => {
+    if (isToday(dueDate)) return "text-accent-foreground bg-accent";
+    if (isPast(dueDate)) return "text-destructive-foreground bg-destructive/80";
+    return "text-muted-foreground bg-muted";
+  }
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          {todos.length > 0 ? (
+            todos.map((todo) => (
+              <div
+                key={todo.id}
+                className="flex items-center gap-3 p-2 rounded-md transition-colors hover:bg-muted/50"
+              >
+                <Checkbox
+                  id={`todo-${todo.id}`}
+                  checked={todo.completed}
+                  onCheckedChange={() => toggleTodo(todo.id)}
+                  className="w-5 h-5"
+                />
+                <label
+                  htmlFor={`todo-${todo.id}`}
+                  className={cn(
+                    'flex-1 text-sm font-medium transition-colors',
+                    todo.completed ? 'text-muted-foreground line-through' : 'text-foreground'
+                  )}
+                >
+                  {todo.text}
+                </label>
+                {todo.dueDate && (
+                  <div className={cn("text-xs px-2 py-0.5 rounded-full whitespace-nowrap", getDueDateClass(todo.dueDate))}>
+                    {format(todo.dueDate, 'MMM d')}
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <p className="text-muted-foreground text-center p-4">
+              Your list is clear. Add a task to get started!
+            </p>
+          )}
+        </CardContent>
+      </Card>
+      <div className="flex gap-2">
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="flex-1" variant="default">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Task
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add a new task</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleAddTodo} className="grid gap-4 py-4">
+              <Input
+                placeholder="What do you need to do?"
+                value={newTodoText}
+                onChange={(e) => setNewTodoText(e.target.value)}
+                autoFocus
+              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={'outline'}
+                    className={cn(
+                      'w-full justify-start text-left font-normal',
+                      !newTodoDueDate && 'text-muted-foreground'
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {newTodoDueDate ? format(newTodoDueDate, 'PPP') : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={newTodoDueDate}
+                    onSelect={setNewTodoDueDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="ghost">Cancel</Button>
+                </DialogClose>
+                <Button type="submit">Add Task</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+        <Button variant="destructive" size="icon" onClick={clearCompleted} disabled={!todos.some(t => t.completed)}>
+          <Trash className="h-4 w-4" />
+          <span className="sr-only">Clear Completed</span>
+        </Button>
+      </div>
+    </div>
+  );
+}
