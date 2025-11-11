@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { User } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -39,8 +40,10 @@ export default function DashboardLayout({
             </div>
             <Link href="/dashboard/account">
               <Avatar>
-                <AvatarImage src={user.photoURL ?? "https://picsum.photos/seed/user/40/40"} alt={user.displayName ?? "User"} data-ai-hint="person face" />
-                <AvatarFallback>{user.email?.charAt(0).toUpperCase()}</AvatarFallback>
+                <AvatarImage src={user.photoURL || undefined} alt={user.displayName ?? "User"} data-ai-hint="person face" />
+                <AvatarFallback>
+                  {user.photoURL ? user.email?.charAt(0).toUpperCase() : <User className="w-5 h-5 text-muted-foreground" />}
+                </AvatarFallback>
               </Avatar>
             </Link>
         </header>

@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth, useFirebase, useUser, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
-import { Camera, Loader2 } from 'lucide-react';
+import { Camera, Loader2, User as UserIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
@@ -160,8 +160,10 @@ export default function AccountPage() {
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
               <Avatar className="w-32 h-32">
-                <AvatarImage src={user.photoURL || "https://picsum.photos/seed/user/128/128"} alt="Uživatel" data-ai-hint="person face" />
-                <AvatarFallback>{user.email?.charAt(0).toUpperCase()}</AvatarFallback>
+                <AvatarImage src={user.photoURL || undefined} alt="Uživatel" data-ai-hint="person face" />
+                <AvatarFallback>
+                  <UserIcon className="w-16 h-16 text-muted-foreground" />
+                </AvatarFallback>
               </Avatar>
               <Button
                 variant="outline"
