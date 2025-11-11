@@ -18,10 +18,39 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { isSameDay, format } from 'date-fns';
+import { isSameDay, format, isAfter, isSameDay as isSameDayFns, getDay, getDate, getMonth, isBefore } from 'date-fns';
 import { useCollection, useFirebase, useUser, useMemoFirebase } from '@/firebase';
 import { addDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { collection, doc, serverTimestamp } from 'firebase/firestore';
+
+const isEventOnDate = (event: CalendarEvent, date: Date): boolean => {
+    const eventStartDate = new Date((event.startTime as any).seconds * 1000);
+  
+    // If the selected date is before the event's start date, it can't occur.
+    if (isBefore(date, eventStartDate) && !isSameDayFns(date, eventStartDate)) {
+        return false;
+    }
+
+    // Always show on the original start date
+    if (isSameDayFns(date, eventStartDate)) {
+        return true;
+    }
+
+    switch (event.recurringRule) {
+        case 'none':
+            return isSameDayFns(date, eventStartDate);
+        case 'daily':
+            return isAfter(date, eventStartDate) || isSameDayFns(date, eventStartDate);
+        case 'weekly':
+            // Check if it's after the start date and on the same day of the week
+            return (isAfter(date, eventStartDate) || isSameDayFns(date, eventStartDate)) && getDay(date) === getDay(eventStartDate);
+        case 'monthly':
+            // Check if it's after the start date and on the same day of the month
+            return (isAfter(date, eventStartDate) || isSameDayFns(date, eventStartDate)) && getDate(date) === getDate(eventStartDate);
+        default:
+            return isSameDayFns(date, eventStartDate);
+    }
+};
 
 export default function CalendarView() {
   const { firestore } = useFirebase();
@@ -69,8 +98,8 @@ export default function CalendarView() {
   }
 
   const todaysEvents = events?.filter((event) =>
-    date ? isSameDay(new Date((event.startTime as any).seconds * 1000), date) : false
-  ) || [];
+    date ? isEventOnDate(event, date) : false
+  ).sort((a, b) => (a.startTime as any).seconds - (b.startTime as any).seconds) || [];
 
   return (
     <div className="space-y-4">
