@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { CalendarDays, ListTodo, Moon, User } from 'lucide-react';
+import { CalendarDays, ListTodo, Moon, User, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/dashboard/todos', label: 'To-Do', icon: ListTodo },
-  { href: '/dashboard/calendar', label: 'Plan', icon: CalendarDays },
+  { href: '/dashboard/calendar', label: 'Calendar', icon: CalendarDays },
+  { href: '/dashboard/time', label: 'Time', icon: Clock },
   { href: '/dashboard/sleep', label: 'Sleep', icon: Moon },
   { href: '/dashboard/account', label: 'Account', icon: User },
 ];
