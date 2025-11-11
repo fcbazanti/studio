@@ -1,0 +1,102 @@
+/**
+ * @file Firestore Security Rules for Verdant Day Application
+ * @description This ruleset enforces a strict user-ownership model for all data. Each user has exclusive access to their profile, todos, calendar events, and sleep data.
+ *
+ * @dataStructure
+ *   - /users/{userId}: Stores user profile information.
+ *   - /users/{userId}/todos/{todoId}: Stores to-do items specific to a user.
+ *   - /users/{userId}/calendarEvents/{calendarEventId}: Stores calendar events specific to a user.
+ *   - /users/{userId}/sleepData/{sleepDataId}: Stores sleep data specific to a user.
+ *
+ * @keySecurityDecisions
+ *   - Users can only access their own data.
+ *   - Listing of other user profiles is not permitted.
+ *
+ * @denormalizationForAuthorization Not applicable in this design as all data access is based on strict user-ownership. No denormalization is required.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Secure user profiles, allowing only the owner to read and write.
+     * @path /users/{userId}
+     * @allow (create) User 'test_user' with UID 'userId' can create their profile if request.auth.uid == userId.
+     * @allow (get, update, delete) User 'userId' with UID 'userId' can get, update, and delete their own profile.
+     * @deny (create) User 'other_user' with UID 'otherId' cannot create a profile with ID 'userId'.
+     * @deny (get, update, delete) User 'other_user' with UID 'otherId' cannot get, update, or delete user profile 'userId'.
+     * @principle Enforces path-based ownership and restricts access to a user's own profile.
+     */
+    match /users/{userId} {
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+
+      allow get: if isOwner(userId);
+      allow list: if false; // Listing all users is not permitted.
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isOwner(userId) && resource.data.id == userId;
+      allow delete: if isOwner(userId) && resource.data.id == userId;
+    }
+
+    /**
+     * @description Secure to-do items, allowing only the owner to read and write.
+     * @path /users/{userProfileId}/todos/{todoId}
+     * @allow (create) User 'user1' with UID 'user1' can create a to-do item in their profile.
+     * @allow (get, update, delete) User 'user1' with UID 'user1' can get, update, and delete to-do item 'todo1' in their profile.
+     * @deny (create) User 'user2' with UID 'user2' cannot create a to-do item in user1's profile.
+     * @deny (get, update, delete) User 'user2' with UID 'user2' cannot get, update, or delete to-do item 'todo1' in user1's profile.
+     * @principle Enforces path-based ownership and restricts access to a user's own to-do items.
+     */
+    match /users/{userProfileId}/todos/{todoId} {
+      function isOwner(userProfileId) {
+        return request.auth != null && request.auth.uid == userProfileId;
+      }
+      allow get: if isOwner(userProfileId);
+      allow list: if isOwner(userProfileId);
+      allow create: if isOwner(userProfileId) && request.resource.data.userProfileId == userProfileId;
+      allow update: if isOwner(userProfileId) && resource.data.userProfileId == userProfileId;
+      allow delete: if isOwner(userProfileId) && resource.data.userProfileId == userProfileId;
+    }
+
+    /**
+     * @description Secure calendar events, allowing only the owner to read and write.
+     * @path /users/{userProfileId}/calendarEvents/{calendarEventId}
+     * @allow (create) User 'user1' with UID 'user1' can create a calendar event in their profile.
+     * @allow (get, update, delete) User 'user1' with UID 'user1' can get, update, and delete calendar event 'event1' in their profile.
+     * @deny (create) User 'user2' with UID 'user2' cannot create a calendar event in user1's profile.
+     * @deny (get, update, delete) User 'user2' with UID 'user2' cannot get, update, or delete calendar event 'event1' in user1's profile.
+     * @principle Enforces path-based ownership and restricts access to a user's own calendar events.
+     */
+    match /users/{userProfileId}/calendarEvents/{calendarEventId} {
+      function isOwner(userProfileId) {
+        return request.auth != null && request.auth.uid == userProfileId;
+      }
+      allow get: if isOwner(userProfileId);
+      allow list: if isOwner(userProfileId);
+      allow create: if isOwner(userProfileId) && request.resource.data.userProfileId == userProfileId;
+      allow update: if isOwner(userProfileId) && resource.data.userProfileId == userProfileId;
+      allow delete: if isOwner(userProfileId) && resource.data.userProfileId == userProfileId;
+    }
+
+    /**
+     * @description Secure sleep data, allowing only the owner to read and write.
+     * @path /users/{userProfileId}/sleepData/{sleepDataId}
+     * @allow (create) User 'user1' with UID 'user1' can create a sleep data entry in their profile.
+     * @allow (get, update, delete) User 'user1' with UID 'user1' can get, update, and delete sleep data entry 'sleep1' in their profile.
+     * @deny (create) User 'user2' with UID 'user2' cannot create a sleep data entry in user1's profile.
+     * @deny (get, update, delete) User 'user2' with UID 'user2' cannot get, update, or delete sleep data entry 'sleep1' in user1's profile.
+     * @principle Enforces path-based ownership and restricts access to a user's own sleep data.
+     */
+    match /users/{userProfileId}/sleepData/{sleepDataId} {
+      function isOwner(userProfileId) {
+        return request.auth != null && request.auth.uid == userProfileId;
+      }
+      allow get: if isOwner(userProfileId);
+      allow list: if isOwner(userProfileId);
+      allow create: if isOwner(userProfileId) && request.resource.data.userProfileId == userProfileId;
+      allow update: if isOwner(userProfileId) && resource.data.userProfileId == userProfileId;
+      allow delete: if isOwner(userProfileId) && resource.data.userProfileId == userProfileId;
+    }
+  }
+}
