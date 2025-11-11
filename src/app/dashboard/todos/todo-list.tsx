@@ -25,12 +25,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { format, isToday, isPast } from 'date-fns';
 
-const initialTodos: Todo[] = [
-  { id: '1', text: 'Morning meditation', completed: true, dueDate: new Date() },
-  { id: '2', text: 'Team stand-up meeting', completed: false, dueDate: new Date() },
-  { id: '3', text: 'Finish project proposal', completed: false, dueDate: new Date(new Date().setDate(new Date().getDate() + 1)) },
-  { id: '4', text: 'Go for a run', completed: false },
-];
+const initialTodos: Todo[] = [];
 
 export default function TodoList() {
   const [todos, setTodos] = useState<Todo[]>(initialTodos);
