@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useFormState } from 'react-dom';
+import { useState, useActionState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -17,20 +16,11 @@ const initialState = {
 export default function SleepForm() {
   const [bedtime, setBedtime] = useState('22:30');
   const [wakeUpTime, setWakeUpTime] = useState('06:30');
-  const [formState, formAction] = useFormState(getSleepRecommendation, initialState);
-  const [isPending, setIsPending] = useState(false);
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsPending(true);
-    const formData = new FormData(event.currentTarget);
-    await formAction(formData);
-    setIsPending(false);
-  };
+  const [formState, formAction, isPending] = useActionState(getSleepRecommendation, initialState);
 
   return (
     <div className="space-y-4">
-      <form onSubmit={handleSubmit}>
+      <form action={formAction}>
         <Card>
           <CardHeader>
             <CardTitle>Enter Your Sleep Times</CardTitle>
