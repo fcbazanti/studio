@@ -1,4 +1,4 @@
-import { BottomNav } from '@/components/bottom-nav';
+import { TopNav } from '@/components/top-nav';
 import { AppIcon } from '@/components/app-icon';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
@@ -23,8 +23,8 @@ export default function DashboardLayout({
               </Avatar>
             </Link>
         </header>
-        <main className="flex-1 overflow-y-auto pb-20 md:pb-4">{children}</main>
-        <BottomNav />
+        <TopNav />
+        <main className="flex-1 overflow-y-auto md:pb-4">{children}</main>
       </div>
     </div>
   );
